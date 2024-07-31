@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Chat</title>
+    <style>
+        @font-face {
+            font-family: 'xiangsu';
+             src: url('k8x12-2.ttf') format('truetype');
+        }
+
+        @font-face {
+            font-family: 'xiangsu2';
+             src: url('HYPixel11pxJ-2.ttf') format('truetype');
+        }
+
+        body {
+            background-color: #090B0E;
+            color: white;
+            font-family: 'xiangsu2';
+        }
+        
+        .response {
+            text-align: center;
+            font-size: 23px;
+            margin-top: 60px;
+        }
+        
+
+        img {
+            width: 20%;
+            height: 20%;
+            margin-left: 550px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+
+        .chat-container {
+            width: 50%;
+            margin: auto;
+        }
+        
+        .chat-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            border-radius: 10px;
+            background-color: #222;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            width: 90%;
+            height: 70%;
+            resize: none;
+            outline: none;
+            border: none;
+            background-color: transparent;
+            color: inherit;
+        }
+        
+        button {
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            color: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            filter: brightness(120%);
+        }
+
+        footer{
+            margin-left: 1000px;
+            font-size: 12px;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            font-family: 'xiangsu';
+            font-size: 3em;
+        }
+        
+        a {
+        text-decoration: none;
+        color: inherit;
+        }
+
+        a:visited {
+        text-decoration: none;
+        color: inherit;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="response" class="response" placeholder="你想说什么？"></div>
+
+
+    <img class="img" src="avatar.png" alt="Chatbot Avatar">
+
+    <div class="chat-container">
+        <div class="chat-box">
+            <textarea id="input" onkeydown="handleKeyDown(event)" placeholder="请输入消息"></textarea>
+            <button onclick="sendChat()">发送</button>
+        </div>
+    </div>
+    <script>
+        function handleKeyDown(event) {
+            if (event.keyCode === 13 && event.shiftKey === false) { // 如果没有按住 Shift 键则发送消息
+                sendChat();
+            }
+        }
+
+        function sendChat() {
+            const messageInput = document.getElementById("input");
+            const message = messageInput.value;
+            if (message.trim()) { 
+                fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+                    method: 'POST',
+                    headers: {  
+                        'Authorization': 'Bearer ${API_KEY}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "model": "glm-4-air",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "#role:你将扮演一个名为张嘉明的人。#character:你是一个产品经理,精通ai领域的相关知识,性格暴躁,不耐烦,喜欢开玩笑和犯贱。#skill:用不太友好的语气解答对方的疑惑。#constraints:1.请注意,你要全身心扮演他.2.不能说自己是ChatGPT,也不能说自己是一个机器人。3.每次回答不要超过50个字。"
+                            },
+                            {
+                                "role": "user",
+                                "content": message
+                            }
+                        ]
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.choices && data.choices.length > 0) {
+                        const responseMessage = data.choices[0].message.content;
+                        displayResponse(responseMessage);
+                    } else {
+                        console.error('Unexpected response format from the server.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    displayResponse('出错了，请稍后再试。');
+                });
+
+                // 清空输入框
+                messageInput.value = '';
+            } else {
+                alert("请输入内容!");
+            }
+        }
+        function displayResponse(message) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.textContent = message;
+        }
+    </script>
+
+    <footer>
+        <a href="#" target="_blank">BLOG</a>
+        <a href="#" target="_blank">ART</a>
+        <a href="#" target="_blank">CONTACT</a>
+    </footer>
+</body>
+</html>
