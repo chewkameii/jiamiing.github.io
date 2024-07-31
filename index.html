@@ -114,6 +114,7 @@
             <button onclick="sendChat()">发送</button>
         </div>
     </div>
+    <script src="path/to/config.js"></script>
     <script>
         function handleKeyDown(event) {
             if (event.keyCode === 13 && event.shiftKey === false) { // 如果没有按住 Shift 键则发送消息
@@ -128,7 +129,7 @@
                 fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
                     method: 'POST',
                     headers: {  
-                        'Authorization': 'Bearer ${API_KEY}',
+                        'Authorization': 'Bearer ${window.API_KEY}',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
